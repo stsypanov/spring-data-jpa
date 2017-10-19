@@ -15,8 +15,7 @@
  */
 package org.springframework.data.jpa.repository;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.data.jpa.support.EntityManagerTestUtils.*;
 
 import java.util.List;
@@ -29,6 +28,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -102,9 +102,9 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 
 		List<User> result = repository.findAll();
 
-		assertThat(result.size(), is(3));
-		assertThat(util.isLoaded(result.get(0), "roles"), is(true));
-		assertThat(result.get(0), is(tom));
+		assertThat(result.size()).isEqualTo(3);
+		assertThat(util.isLoaded(result.get(0), "roles")).isTrue();
+		assertThat(result.get(0)).isEqualTo(tom);
 	}
 
 	@Test // DATAJPA-689
@@ -116,9 +116,10 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 
 		User user = repository.findById(tom.getId()).get();
 
-		assertThat(user, is(notNullValue()));
-		assertThat("colleages should be fetched with 'user.detail' fetchgraph", util.isLoaded(user, "colleagues"),
-				is(true));
+		assertThat(user).isNotNull();
+		assertThat(util.isLoaded(user, "colleagues")) //
+				.describedAs("colleages should be fetched with 'user.detail' fetchgraph") //
+				.isTrue();
 	}
 
 	@Test // DATAJPA-696
@@ -130,9 +131,10 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 
 		User user = repository.getOneWithDefinedEntityGraphById(tom.getId());
 
-		assertThat(user, is(notNullValue()));
-		assertThat("colleages should be fetched with 'user.detail' fetchgraph", util.isLoaded(user, "colleagues"),
-				is(true));
+		assertThat(user).isNotNull();
+		assertThat(util.isLoaded(user, "colleagues")) //
+				.describedAs("colleages should be fetched with 'user.detail' fetchgraph") //
+				.isTrue();
 	}
 
 	@Test // DATAJPA-696
@@ -144,15 +146,20 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 
 		User user = repository.getOneWithAttributeNamesById(tom.getId());
 
-		assertThat(user, is(notNullValue()));
+		assertThat(user).isNotNull();
 
-		assertThat("colleages should be fetched with 'user.detail' fetchgraph", util.isLoaded(user, "colleagues"),
-				is(true));
-		assertThat(util.isLoaded(user, "colleagues"), is(true));
+		assertThat(util.isLoaded(user, "colleagues")) //
+				.describedAs("colleages should be fetched with 'user.detail' fetchgraph") //
+				.isTrue();
+		assertThat(util.isLoaded(user, "colleagues")).isTrue();
+
+		SoftAssertions softly = new SoftAssertions();
 
 		for (User colleague : user.getColleagues()) {
-			assertThat(util.isLoaded(colleague, "roles"), is(true));
+			softly.assertThat(util.isLoaded(colleague, "roles")).isTrue();
 		}
+
+		softly.assertAll();
 	}
 
 	@Test // DATAJPA-790, DATAJPA-1087
@@ -165,9 +172,9 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 		Page<User> page = repository.findAll(QUser.user.firstname.isNotNull(), PageRequest.of(0, 100));
 		List<User> result = page.getContent();
 
-		assertThat(result.size(), is(3));
-		assertThat(util.isLoaded(result.get(0).getRoles()), is(true));
-		assertThat(result.get(0), is(tom));
+		assertThat(result.size()).isEqualTo(3);
+		assertThat(util.isLoaded(result.get(0).getRoles())).isTrue();
+		assertThat(result.get(0)).isEqualTo(tom);
 	}
 
 	@Test // DATAJPA-1207
@@ -180,9 +187,9 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 		Page<User> page = repository.findAll(firstnameIsNotNull(), PageRequest.of(0, 100));
 		List<User> result = page.getContent();
 
-		assertThat(result.size(), is(3));
-		assertThat(util.isLoaded(result.get(0).getRoles()), is(true));
-		assertThat(result.get(0), is(tom));
+		assertThat(result.size()).isEqualTo(3);
+		assertThat(util.isLoaded(result.get(0).getRoles())).isTrue();
+		assertThat(result.get(0)).isEqualTo(tom);
 	}
 
 	@Test // DATAJPA-1041
@@ -195,15 +202,19 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 
 		User user = repository.findOneWithMultipleSubGraphsUsingNamedEntityGraphById(tom.getId());
 
-		assertThat(user, is(notNullValue()));
+		assertThat(user).isNotNull();
 
-		assertThat("colleagues on root should have been fetched by named 'User.colleagues' subgraph declaration",
-				util.isLoaded(user, "colleagues"), is(true));
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(util.isLoaded(user, "colleagues")) //
+				.describedAs("colleagues on root should have been fetched by named 'User.colleagues' subgraph  declaration") //
+				.isTrue();
 
 		for (User colleague : user.getColleagues()) {
-			assertThat(util.isLoaded(colleague, "colleagues"), is(true));
-			assertThat(util.isLoaded(colleague, "roles"), is(true));
+			softly.assertThat(util.isLoaded(colleague, "colleagues")).isTrue();
+			softly.assertThat(util.isLoaded(colleague, "roles")).isTrue();
 		}
+
+		softly.assertAll();
 	}
 
 	@Test // DATAJPA-1041
@@ -216,15 +227,19 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 
 		User user = repository.findOneWithMultipleSubGraphsById(tom.getId());
 
-		assertThat(user, is(notNullValue()));
+		assertThat(user).isNotNull();
 
-		assertThat("colleagues on root should have been fetched by dynamic subgraph declaration",
-				util.isLoaded(user, "colleagues"), is(true));
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(util.isLoaded(user, "colleagues")) //
+				.describedAs("colleagues on root should have been fetched by dynamic subgraph declaration") //
+				.isTrue();
 
 		for (User colleague : user.getColleagues()) {
-			assertThat(util.isLoaded(colleague, "colleagues"), is(true));
-			assertThat(util.isLoaded(colleague, "roles"), is(true));
+			softly.assertThat(util.isLoaded(colleague, "colleagues")).isTrue();
+			softly.assertThat(util.isLoaded(colleague, "roles")).isTrue();
 		}
+
+		softly.assertAll();
 	}
 
 	@Test // DATAJPA-1041, DATAJPA-1075
@@ -236,21 +251,26 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 
 		User user = repository.findOneWithDeepGraphById(tom.getId());
 
-		assertThat(user, is(notNullValue()));
-		assertThat("Colleagues on root should have been fetched by dynamic subgraph declaration",
-				Persistence.getPersistenceUtil().isLoaded(user, "colleagues"), is(true));
+		assertThat(user).isNotNull();
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(Persistence.getPersistenceUtil().isLoaded(user, "colleagues")) //
+				.describedAs("Colleagues on root should have been fetched by dynamic subgraph declaration") //
+				.isTrue();
 
 		for (User colleague : user.getColleagues()) {
 
-			assertThat(Persistence.getPersistenceUtil().isLoaded(colleague, "colleagues"), is(true));
-			assertThat(Persistence.getPersistenceUtil().isLoaded(colleague, "roles"), is(true));
+			softly.assertThat(Persistence.getPersistenceUtil().isLoaded(colleague, "colleagues")).isTrue();
+			softly.assertThat(Persistence.getPersistenceUtil().isLoaded(colleague, "roles")).isTrue();
 
 			for (User colleagueOfColleague : colleague.getColleagues()) {
 
-				assertThat(Persistence.getPersistenceUtil().isLoaded(colleagueOfColleague, "roles"), is(true));
-				assertThat(Persistence.getPersistenceUtil().isLoaded(colleagueOfColleague, "colleagues"), is(false));
+				softly.assertThat(Persistence.getPersistenceUtil().isLoaded(colleagueOfColleague, "roles")).isTrue();
+				softly.assertThat(Persistence.getPersistenceUtil().isLoaded(colleagueOfColleague, "colleagues")).isFalse();
 			}
 		}
+
+		softly.assertAll();
 	}
 
 	private Specification<User> firstnameIsNotNull() {
