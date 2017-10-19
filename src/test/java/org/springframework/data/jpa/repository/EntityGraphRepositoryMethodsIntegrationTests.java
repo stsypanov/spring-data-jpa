@@ -42,7 +42,6 @@ import org.springframework.data.jpa.domain.sample.Role;
 import org.springframework.data.jpa.domain.sample.User;
 import org.springframework.data.jpa.domain.sample.User_;
 import org.springframework.data.jpa.repository.sample.RepositoryMethodsWithEntityGraphConfigRepository;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -184,7 +183,11 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 		em.flush();
 		em.clear();
 
-		Page<User> page = repository.findAll(firstnameIsNotNull(), PageRequest.of(0, 100));
+		Page<User> page = repository.findAll( //
+				(Specification<User>) this::firstNameIsNotNull, //
+				PageRequest.of(0, 100) //
+		);
+
 		List<User> result = page.getContent();
 
 		assertThat(result.size()).isEqualTo(3);
@@ -273,13 +276,8 @@ public class EntityGraphRepositoryMethodsIntegrationTests {
 		softly.assertAll();
 	}
 
-	private Specification<User> firstnameIsNotNull() {
-		return new Specification<User>() {
-			@Nullable
-			@Override
-			public Predicate toPredicate(Root root, CriteriaQuery query, CriteriaBuilder criteriaBuilder) {
-				return criteriaBuilder.isNotNull(root.get(User_.firstname));
-			}
-		};
+	private Predicate firstNameIsNotNull(Root<User> root, CriteriaQuery<?> __, CriteriaBuilder criteriaBuilder) {
+		return criteriaBuilder.isNotNull(root.get(User_.firstname));
 	}
+
 }
