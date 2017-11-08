@@ -117,7 +117,7 @@ final class NamedQuery extends AbstractJpaQuery {
 	@Nullable
 	public static RepositoryQuery lookupFrom(JpaQueryMethod method, EntityManager em) {
 
-		final String queryName = method.getNamedQueryName();
+		String queryName = method.getNamedQueryName();
 
 		LOG.debug("Looking up named query {}", queryName);
 
@@ -153,7 +153,7 @@ final class NamedQuery extends AbstractJpaQuery {
 	protected TypedQuery<Long> doCreateCountQuery(Object[] values) {
 
 		EntityManager em = getEntityManager();
-		TypedQuery<Long> countQuery = null;
+		TypedQuery<Long> countQuery;
 
 		if (namedCountQueryIsPresent) {
 			countQuery = em.createNamedQuery(countQueryName, Long.class);

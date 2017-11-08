@@ -184,7 +184,7 @@ public abstract class JpaQueryExecution {
 
 		@Override
 		@SuppressWarnings("unchecked")
-		protected Object doExecute(final AbstractJpaQuery repositoryQuery, final Object[] values) {
+		protected Object doExecute(AbstractJpaQuery repositoryQuery, Object[] values) {
 
 			ParameterAccessor accessor = new ParametersParameterAccessor(parameters, values);
 			Query query = repositoryQuery.createQuery(values);

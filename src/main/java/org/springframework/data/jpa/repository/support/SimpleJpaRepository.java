@@ -558,7 +558,7 @@ public class SimpleJpaRepository<T, ID> implements JpaRepository<T, ID>, JpaSpec
 	 * @param pageable can be {@literal null}.
 	 * @return
 	 */
-	protected <S extends T> Page<S> readPage(TypedQuery<S> query, final Class<S> domainClass, Pageable pageable,
+	protected <S extends T> Page<S> readPage(TypedQuery<S> query, Class<S> domainClass, Pageable pageable,
 			@Nullable Specification<S> spec) {
 
 		if (pageable.isPaged()) {
