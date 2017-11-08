@@ -52,7 +52,6 @@ import org.springframework.util.StringUtils;
  * @author Thomas Darimont
  * @author Christoph Strobl
  * @author Mark Paluch
- * @author Сергей Цыпанов
  */
 public class JpaQueryMethod extends QueryMethod {
 
@@ -156,12 +155,14 @@ public class JpaQueryMethod extends QueryMethod {
 	 */
 	List<QueryHint> getHints() {
 
+		List<QueryHint> result = Collections.emptyList();
+
 		QueryHints hints = AnnotatedElementUtils.findMergedAnnotation(method, QueryHints.class);
 		if (hints != null) {
-			return Arrays.asList(hints.value());
+			result = Arrays.asList(hints.value());
 		}
 
-		return Collections.emptyList();
+		return result;
 	}
 
 	/**
