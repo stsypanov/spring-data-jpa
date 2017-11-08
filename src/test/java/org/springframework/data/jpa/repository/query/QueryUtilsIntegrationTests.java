@@ -169,6 +169,21 @@ public class QueryUtilsIntegrationTests {
 		assertThat(orders).hasSize(1);
 	}
 
+	@Test // DATAJPA-1080 //todo for unsorted
+	public void toOrdersNoOrdersForUnsorted() {
+
+		CriteriaBuilder builder = em.getCriteriaBuilder();
+		CriteriaQuery<User> query = builder.createQuery(User.class);
+		Root<User> root = query.from(User.class);
+		Join<User, User> join = root.join("manager", JoinType.LEFT);
+
+		Sort sort = Sort.by(Collections.emptyList());
+
+		List<javax.persistence.criteria.Order> orders = QueryUtils.toOrders(sort, join, builder);
+
+		assertThat(orders).hasSize(0);
+	}
+
 	@Entity
 	@SuppressWarnings("unused")
 	static class Merchant {

@@ -56,17 +56,17 @@ final class NamedQuery extends AbstractJpaQuery {
 
 		super(method, em);
 
-		this.queryName = method.getNamedQueryName();
-		this.countQueryName = method.getNamedCountQueryName();
-		this.extractor = method.getQueryExtractor();
-		this.countProjection = method.getCountQueryProjection();
-
 		Parameters<?, ?> parameters = method.getParameters();
 
 		if (parameters.hasSortParameter()) {
 			throw new IllegalStateException(String.format("Finder method %s is backed " + "by a NamedQuery and must "
 					+ "not contain a sort parameter as we cannot modify the query! Use @Query instead!", method));
 		}
+
+		this.queryName = method.getNamedQueryName();
+		this.countQueryName = method.getNamedCountQueryName();
+		this.extractor = method.getQueryExtractor();
+		this.countProjection = method.getCountQueryProjection();
 
 		this.namedCountQueryIsPresent = hasNamedQuery(em, countQueryName);
 
